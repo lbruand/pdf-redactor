@@ -49,7 +49,7 @@ options.content_filters = [
 
 	(
 		
-		re.compile(r"[0-9]{3} *[A-Z][0-9]{5} [A-Z]"),#r"[0-9]{3} [A-Z][0-9]{5}) [A-Z]"),
+		re.compile(r"[0-9]{3} *[A-Z][0-9]{5} [A-Z]"),
 		lambda m : "000 A00000 A"
 	),
 	( 
