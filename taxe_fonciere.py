@@ -13,11 +13,11 @@ options = pdf_redactor.RedactorOptions()
 
 options.metadata_filters = {
 	# Perform some field filtering --- turn the Title into uppercase.
-	"Title": [lambda value : value.upper()],
+	"Title": [lambda value : value],
 
 	# Set some values, overriding any value present in the PDF.
-	"Producer": [lambda value : "My Name"],
-	"CreationDate": [lambda value : datetime.utcnow()],
+	"Producer": [lambda value : value],
+	"CreationDate": [lambda value : value],
 
 	# Clear all other fields.
 	"DEFAULT": [lambda value : None],
@@ -38,15 +38,28 @@ options.content_filters = [
 	# Then do an actual SSL regex.
 	# See https://github.com/opendata/SSN-Redaction for why this regex is complicated.
 	(
-		re.compile(r"(?<!\d)(?!666|000|9\d{2})([OoIli0-9]{3})([\s-]?)(?!00)([OoIli0-9]{2})\2(?!0{4})([OoIli0-9]{4})(?!\d)"),
-		lambda m : "XXX-XX-XXXX"
+		re.compile(r"[0-9]{2} [0-9]{2} [0-9]{3} [0-9]{3} [0-9]{3}"),
+		lambda m : "00 00 000 000 000"
+	),
+	
+	(
+		re.compile(r"[0-9]{2} [0-9]{2} [0-9]{7} [0-9]{2}"),
+		lambda m : "00 00 0000000 00"
 	),
 
-	# Content filter that runs on the text comment annotation body.
 	(
-		re.compile(r"comment!"),
-		lambda m : "annotation?"
+		
+		re.compile(r"[0-9]{3} *[A-Z][0-9]{5} [A-Z]"),#r"[0-9]{3} [A-Z][0-9]{5}) [A-Z]"),
+		lambda m : "000 A00000 A"
 	),
+	( 
+		re.compile("[A-Z]* [0-9]{4} [A-Z0-9]{6}"),
+		lambda m: "---"
+	),
+	(
+		re.compile(r"[0-9]{3} [0-9]{2} [0-9]{3} [0-9]{3} [0-9]{3} [0-9]{3} [A-Z] [A-Z]"),
+		lambda m: "000 00 000 000 000 000 A A"
+	)
 ]
 
 # Filter the link target URI.
